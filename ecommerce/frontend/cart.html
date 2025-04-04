@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header>
+        <div class="wrapper">
+            <h1>My Cart</h1>
+            <a href="./index.html">Back to Shop</a>
+        </div>
+    </header>
+
+    <main class="cart-page">
+        <div id="cart-items" class="products-grid"></div>
+
+        <div class="actions">
+            <p id="total-price"></p>
+            <button id="clear-cart">Clear Cart</button>
+            <button>Check Out</button>
+        </div>
+       
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            displayCart();
+            document.getElementById("clear-cart").addEventListener("click", clearCart);
+        });
+
+        function displayCart() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let cartDiv = document.getElementById("cart-items");
+            let totalPrice = 0;
+
+            cartDiv.innerHTML = "";
+
+            if (cart.length === 0) {
+                cartDiv.innerHTML = "<p>Your cart is empty.</p>";
+                document.getElementById("total-price").innerText = "";
+                return;
+            }
+
+            cart.forEach(product => {
+                let cartItem = document.createElement("div");
+                cartItem.classList.add("card");
+                let cardImage = document.createElement('img')
+                cardImage.src = product.imageUrl;
+                console.log('card image: ',cardImage)
+
+                let name = document.createElement("h3");
+                name.innerText = product.name;
+
+                let price = document.createElement("p");
+                price.innerText = `Price: sh${product.price}`;
+
+                let quantity = document.createElement("p");
+                quantity.innerText = `Quantity: ${product.quantity}`;
+
+                let removeButton = document.createElement("button");
+                removeButton.innerText = "Remove";
+                removeButton.addEventListener("click", () => removeFromCart(product.id));
+
+                cartItem.append(cardImage,name, price, quantity, removeButton);
+                cartDiv.appendChild(cartItem);
+
+                totalPrice += product.price * product.quantity;
+            });
+
+            document.getElementById("total-price").innerText = `Total: sh${totalPrice}`;
+        }
+
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart = cart.filter(product => product.id !== productId);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            displayCart();
+        }
+
+        function clearCart() {
+            localStorage.removeItem("cart");
+            displayCart();
+        }
+    </script>
+</body>
+</html>
